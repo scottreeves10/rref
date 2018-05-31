@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+https://geocompr.robinlovelace.net/
+
+```{r}
+library(sf)          # classes and functions for vector data
+library(raster)      # classes and functions for raster data
+library(spData)        # load geographic data
+
+
+```
+
+https://github.com/Robinlovelace/geocompr/issues/126
+```{r}
+#install.packages("spDataLarge", repos = "https://nowosad.github.io/drat/", type = "source")
+#library(spDataLarge)   # load larger geographic data
+```
+
+```{r}
+names(world)
+```
+```{r}
+plot(world)
+```
+
