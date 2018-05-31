@@ -1,0 +1,103 @@
+---
+title: "Mapping - Sandy Spring, GA"
+author: Scott Reeves
+# date: 2018-05-20
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+##  Notes and shortcut reminders
+
+Add a new chunk:
+by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+Run chunk:
+by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Preview/Knit:
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file). The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Assignment:
+  Alt/Opt+-
+
+Commment/Uncomment:
+  Ctrl/Cmd+Shift+C
+
+## Data Sources
+
+Open Data, City of Sandy Springs
+https://data-coss.opendata.arcgis.com/
+
+## Load Library Packages
+
+```{r message=FALSE, warning=FALSE}
+library(tmap)
+library(tmaptools)
+library(rio)
+library(tidyverse)
+```
+
+## Load Data
+
+```{r}
+# Assign fiile paths to vars
+
+districtsshapefile <- "F:/datasets/sandyspringsga/City_Council__Sandy_Springs_Georgia/City_Council__Sandy_Springs_Georgia.shp"
+
+crimedatafile <- "F:/datasets/sandyspringsga/Sandy_Springs_Police_Department.xlsx"
+```
+
+```{r}
+# Assign shapefile to a variable using tmaptools's read_shape()
+# as.sf = TRUE means as a simple features object (sf package) akin to a regualr dataframe.
+
+ssgeo <- read_shape(districtsshapefile, as.sf = TRUE)
+
+```
+
+```{r}
+# Try a couple of quick basic plots
+
+plot(ssgeo)
+```
+
+```{r}
+qtm(ssgeo)
+```
+
+```{r}
+qtm(ssgeo, fill = "DISTRICT")
+```
+
+
+```{r}
+# Assign data file to var
+sscrime <- rio::import(crimedatafile)
+```
+
+```{r}
+#  View the shapefile structure
+str(ssgeo)
+```
+
+```{r}
+# View datafile structure
+str(sscrime)
+```
+```{r}
+# Subset the crime data
+sscrime2018 <- dplyr::filter(sscrime, incident_datetime > "2017-12-31")
+```
+
+```{r}
+tm_shape(ssgeo) +
+tm_dots(sscrime2018)
+
+```
+
+```{r}
+map1 + tm_pol
+```
+

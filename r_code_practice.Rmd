@@ -1,0 +1,399 @@
+---
+title: "R Reference"
+output: html_document
+---
+
+## Setup
+
+```{r}
+library(tidyverse)
+```
+
+# Base R
+
+## c (combine)
+Combine Values into a Vector or List
+
+__Description__
+
+This is a generic function which combines its arguments.
+
+The default method combines its arguments to form a vector. All arguments are coerced to a common type which is the type of the returned value, and all attributes except names are removed.
+
+__Usage__
+
+S3 Generic function
+c(...)
+
+Default S3 method:
+c(..., recursive = FALSE, use.names = TRUE)
+
+__Arguments__
+
+arg | desc
+----|----
+...	| objects to be concatenated.
+recursive	| logical. If recursive = TRUE, the function recursively descends through lists (and pairlists) combining all their elements into a vector.
+use.names	| logical indicating if names should be preserved.
+
+__Details__
+
+The output type is determined from the highest type of the components in the hierarchy:
+
+NULL < raw < logical < integer < double < complex < character < list < expression. 
+
+Pairlists are treated as lists, whereas non-vector components (such names and calls) are treated as one-element lists which cannot be unlisted even if recursive = TRUE.
+
+```{r}
+a <- c(1,7:9)
+a
+```
+
+```{r}
+str(a)
+```
+
+```{r}
+a[2]
+a[1:2]
+a[[2]]
+```
+
+```{r}
+b <- c(1:5, 10.5, "next")
+str(b)
+```
+
+```{r}
+x <- 1:4
+x
+```
+
+```{r}
+names(x) <- letters[1:4]
+x
+```
+
+
+
+
+
+
+
+
+
+
+## R accessors [, [[, $
+
+https://www.r-bloggers.com/r-accessors-explained/ 
+
+An accessor is a method for accessing data in an object usually an attribute of that object.
+
+R natively provides vectors, lists, data frames, matrices, etc. 
+
+In truth, one can get by using only [ to extract information from these structures, but the others are handy in certain scenarios.
+
+### Subset with [
+
+When you want a subset of an object use [. Remember that when you take a subset of an the object you get the same type of thing. Thus, the subset of a vector will be a vector, the subset of a list will be a list and the subset of a data.frame will be a data.frame.
+
+There is one inconsistency, however. The default in R is to reduce the results to the lowest dimension, so if your subset contains only result, you will only get that one item which may be something of a different type. Thus, taking a subset of the iris data frame with only one column
+
+
+`class( iris[ , "Petal.Length" ] )`  
+[1] numeric
+
+returns a numeric vector and not a data frame. You can override this behavior with the little publicized drop parameter, which indicates not to reduce the result. Taking the subset of iris with drop = FALSE
+
+
+`iris[ , "Petal.Length", drop=FALSE ]` is a proper data frame.
+
+Things to Remember:
+
+* Most often, a subset is the same type as the original object.
+* Both indices and names can be used to extract the subset. ( In order to use names, object must have a name type attribute such as names, rownames, colnames, etc. )
+* You can use negative integers to indicate exclusion.
+* Unquoted variables are interpolated within the brackets.
+
+### Extract one item with [[
+
+The double square brackets are used to extract _one element_ from potentially many. 
+
+For vectors yield vectors with a single value; data frames give a column vector; for list, one element:
+
+
+`letters[[3]]`
+
+`iris[["Petal.Length"]]`
+
+The mnemonic device, here is that the double square bracket look as if you are asking for something deep within a container. You are not taking a slice but reaching to get at the one thing at the core.
+
+Three important things to remember:
+
+* You can return only one item.
+* The result is not (necessarily) the same type of object as the container.
+* The dimension will be the dimension of the one item which is not necessarily 1.
+* And, as before:
+  + Names or indices can both be used.
+  + Variables are interpolated.
+  
+### Interact with $
+
+Interestingly enough, the accessor that provides the least unique utility is also probably used the most often used. $ is a special case of [[ in which you access a single item by actual name. 
+
+The following are equivalent:
+
+`iris$Petal.Length`
+`iris[["Petal.Length"]]`
+
+The appeal of this accessor is nothing more than brevity. One character, $, replaces six, [[“”]]. This accessor is handiest when doing interactive programming but should be discouraged for more production oriented code because of its limitations, namely the inability to interpolate the names or use integer indices.
+
+Things to Remember:
+
+* You cannot use integer indices
+* The name will not be interpolated.
+* Returns only one item.
+* If the name contains special characters, the name must be enclosed in backticks: “
+
+That is really all there is to it. [ – for subsets, [[ – for extracting items, and $ – for extracting by name.
+
+## Functions
+
+There are three key steps to creating a new function:
+
+1. You need to pick a name for the function. Here I’ve used rescale01 because this function rescales a vector to lie between 0 and 1.
+
+2. You list the inputs, or arguments, to the function inside function. Here we have just one argument. If we had more the call would look like function(x, y, z).
+
+3. You place the code you have developed in body of the function, a { block that immediately follows function(...).
+
+Note the overall process: I only made the function after I’d figured out how to make it work with a simple input. It’s easier to start with working code and turn it into a function; it’s harder to create a function and then try to make it work.
+
+# Data Types
+
+## Vector
+
+http://r4ds.had.co.nz/vectors.html 
+
+There are two types of vectors:
+
+* Atomic vectors, of which there are six types: logical, integer, double, character, complex, and raw. Integer and double vectors are collectively known as numeric vectors.
+
+* Lists, which are sometimes called recursive vectors because lists can contain other lists.
+
+The chief difference between atomic vectors and lists is that atomic vectors are homogeneous, while lists can be heterogeneous. There’s one other related object: NULL. NULL is often used to represent the absence of a vector (as opposed to NA which is used to represent the absence of a value in a vector). NULL typically behaves like a vector of length 0.
+
+Every vector has two key properties:
+
+Its _type_, which you can determine with typeof().
+
+```
+typeof(letters)
+#> [1] "character"
+ypeof(1:10)
+#> [1] "integer"
+```
+
+Its _length_, which you can determine with length().
+
+```
+x <- list("a", "b", 1:10)
+length(x)
+#> [1] 3
+```
+
+Vectors can also contain arbitrary additional metadata in the form of attributes. These attributes are used to create augmented vectors which build on additional behaviour. There are four important types of augmented vector:
+
+Factors are built on top of integer vectors.
+Dates and date-times are built on top of numeric vectors.
+Data frames and tibbles are built on top of lists.
+This chapter will introduce you to these important vectors from simplest to most complicated. You’ll start with atomic vectors, then build up to lists, and finish off with augmented vectors.
+
+### atomic vector
+
+### list (recursive) vector
+
+## Data Frame
+
+A data frame is a list with class "data.frame".
+
+A data frame is a list of variables of the same number of rows with unique row names, given class "data.frame". If no variables are included, the row names determine the number of rows.
+
+```{r}
+xx <- 1:10
+yy <- letters[1:5]
+z <- as.data.frame(cbind(yy,xx))
+z
+class(z)
+```
+
+
+```{r}
+rv <- list(1, 2, 3)
+rv
+```
+
+```{r}
+ry <- list(list("a", "b", "c"),list(4,5,6))
+str(ry)
+```
+
+```{r}
+# Subset ry object at second element/attrib
+ry[2]
+```
+
+```{r}
+class(ry[2])
+```
+
+
+```{r}
+ry[[2]]
+```
+
+```{r}
+ry[[1]][[2]]
+```
+
+```{r}
+ry[2][1]
+```
+
+```{r}
+ry[2][1]
+```
+
+
+```{r}
+ry[2][2]
+```
+
+```{r}
+L3 <- LETTERS[1:3]
+fac <- sample(L3, 10, replace = TRUE)
+(d <- data.frame(x = 1, y = 1:10, fac = fac))
+```
+
+```{r}
+df<-data.frame("hi","bye")
+names(df)<-c("hello","goodbye")
+
+de<-data.frame("hola","ciao")
+names(de)<-c("hello","goodbye")
+
+newdf <- rbind(df, de)
+```
+
+
+### array
+
+### data frame
+
+## Create
+
+
+
+
+##  Iteration
+
+http://r4ds.had.co.nz/iteration.html 
+
+### For Loops
+
+Imagine we have this simple tibble:
+
+```{r}
+df <- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+```
+
+## Apply, lapply and tapply
+
+### apply
+
+__Apply Functions Over Array Margins__
+
+__Description__
+
+Returns a vector or array or list of values obtained by applying a function to margins of an array or matrix.
+
+__Usage__
+
+apply(X, MARGIN, FUN, ...)
+
+__Arguments__
+
+arg|desc
+---|---
+X	| an array, including a matrix.
+MARGIN	| a vector giving the subscripts which the function will be applied over. E.g., for a matrix 1 indicates rows, 2 indicates columns, c(1, 2) indicates rows and columns. Where X has named dimnames, it can be a character vector selecting dimension names.
+FUN	| the function to be applied: see ‘Details’. In the case of functions like +, %*%, etc., the function name must be backquoted or quoted.
+...	| optional arguments to FUN.
+
+__Examples__
+
+```{r}
+
+## Compute row and column sums for a matrix:
+x <- cbind(x1 = 3, x2 = c(4:1, 2:5))
+dimnames(x)[[1]] <- letters[1:8]
+apply(x, 2, mean, trim = .2)
+col.sums <- apply(x, 2, sum)
+row.sums <- apply(x, 1, sum)
+rbind(cbind(x, Rtot = row.sums), Ctot = c(col.sums, sum(col.sums)))
+
+```
+
+
+### lapply
+
+__Apply a Function over a List or Vector__
+
+Description
+
+`lapply` returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.
+
+`sapply` is a user-friendly version and wrapper of lapply by default returning a vector, matrix or, if simplify = "array", an array if appropriate, by applying simplify2array(). sapply(x, f, simplify = FALSE, USE.NAMES = FALSE) is the same as lapply(x, f).
+
+`vapply` is similar to sapply, but has a pre-specified type of return value, so it can be safer (and sometimes faster) to use.
+
+`replicate` is a wrapper for the common use of sapply for repeated evaluation of an expression (which will usually involve random number generation).
+
+`simplify2array()` is the utility called from sapply() when simplify is not false and is similarly called from mapply().
+
+# Purrr Package
+
+http://r4ds.had.co.nz/iteration.html 
+
+The pattern of looping over a vector, doing something to each element and saving the results is so common that the purrr package provides a family of functions to do it for you. There is one function for each type of output:
+
+`map()` makes a list.
+`map_lgl()` makes a logical vector.
+`map_int()` makes an integer vector.
+`map_dbl()` makes a double vector.
+`map_chr()` makes a character vector.
+
+Each function takes a vector as input, applies a function to each piece, and then returns a new vector that’s the same length (and has the same names) as the input. The type of the vector is determined by the suffix to the map function.
+
+Once you master these functions, you’ll find it takes much less time to solve iteration problems. But you should never feel bad about using a for loop instead of a map function. The map functions are a step up a tower of abstraction, and it can take a long time to get your head around how they work. The important thing is that you solve the problem that you’re working on, not write the most concise and elegant code (although that’s definitely something you want to strive towards!).
+
+Some people will tell you to avoid for loops because they are slow. They’re wrong! (Well at least they’re rather out of date, as for loops haven’t been slow for many years). The chief benefits of using functions like map() is not speed, but clarity: they make your code easier to write and to read.
+
+We can use these functions to perform the same computations as the last for loop. Those summary functions returned doubles, so we need to use `map_dbl()`:
+
+
+
+
+If you’re familiar with the apply family of functions in base R, you might have noticed some similarities with the purrr functions:
+
+`lapply()` is basically identical to `map()`, except that `map()` is consistent with all the other functions in purrr, and you can use the shortcuts for `.f`.
+
+Base `sapply()` is a wrapper around `lapply()` that automatically simplifies the output. This is useful for interactive work but is problematic in a function because you never know what sort of output you’ll get:
+
+
+`vapply()` is a safe alternative to `sapply()` because you supply an additional argument that defines the type. The only problem with `vapply()` is that it’s a lot of typing: `vapply(df, is.numeric, logical(1))` is equivalent to `map_lgl(df, is.numeric)`. One advantage of `vapply()` over purrr’s map functions is that it can also produce matrices — the map functions only ever produce vectors.
