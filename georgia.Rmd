@@ -23,7 +23,7 @@ __Georgia Open Data__
 
 https://data-georgiagio.opendata.arcgis.com/datasets?q=boundaries&sort_by=relevance
 
-__County Helath Rankings__
+__County Health Rankings__
 
 http://www.countyhealthrankings.org/rankings/data/GA 
 
@@ -106,14 +106,23 @@ tm_shape(gaobesity) +
 ```
 
 ```{r}
-tm_shape(gaobesity) +
+gao <- tm_shape(gaobesity) +
   tm_polygons("Z_Score") +
   tm_legend(legend.position = c("right", "top"),
-            main.title = "Georgia Obesity - Deviation by County",
+            main.title = "Georgia Adult Obesity - Deviation by County",
             main.title.position = "left",
-            main.title.size = 1)
+            main.title.size = 1) +
+  tm_credits("Adult Obesity =  % of adults that report a BMI >= 30\nZ -Score = (Measure - Average of state counties)/(Standard Deviation)", size = 1, position = c("LEFT", "BOTTOM")) +
+  tm_layout(inner.margins = c(.15,.05,.05,.05), asp = 1.25)
 ```
 
+```{r}
+gao
+```
+
+```{r}
+save_tmap(gao, "ga_adult_obesity.png")
+```
 
 
 ```{r}
