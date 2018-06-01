@@ -1,2 +1,3 @@
 $ cat .gitattributes
-*.rb linguist-language=R
+*.rmd linguist-language=R
+*.css linguist-vendored

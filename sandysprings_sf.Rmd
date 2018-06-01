@@ -1,0 +1,110 @@
+---
+title: "Mapping - Sandy Spring, GA"
+author: Scott Reeves
+# date: 2018-05-20
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+# Sources and References
+
+Open Data, City of Sandy Springs
+https://data-coss.opendata.arcgis.com/ 
+
+https://xvrdm.github.io/2017/09/15/create-maps-from-sitg-files-with-sf-and-ggplot2/ 
+
+http://ggplot2.tidyverse.org/reference/ggsf.html 
+
+# Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(sf)
+library(tidyverse)
+
+
+# library(ggplot2)
+# could not find function “geom_sf”
+# 
+# While running R as the administrator, reinstall ggplot2 like this:
+# 
+# devtools::install_github("tidyverse/ggplot2")
+# require(ggplot2)
+
+# library(tmap)
+# library(tmaptools)
+# library(rio)
+```
+
+## Data
+
+```{r}
+# Assign file paths to vars
+
+citylimits <- st_read("F:/datasets/sandyspringsga/City_Limit__Sandy_Springs_Georgia/City_Limit__Sandy_Springs_Georgia.shp")
+
+```
+
+```{r}
+plot(citylimits[9])
+```
+
+```{r}
+glimpse(citylimits)
+```
+
+
+```{r}
+# Assign shapefile to a variable using tmaptools's read_shape()
+# as.sf = TRUE means as a simple features object (sf package) akin to a regualr dataframe.
+
+ssgeo <- read_shape(districtsshapefile, as.sf = TRUE)
+
+```
+
+```{r}
+# Try a couple of quick basic plots
+
+plot(ssgeo)
+```
+
+```{r}
+qtm(ssgeo)
+```
+
+```{r}
+qtm(ssgeo, fill = "DISTRICT")
+```
+
+
+```{r}
+# Assign data file to var
+sscrime <- rio::import(crimedatafile)
+```
+
+```{r}
+#  View the shapefile structure
+str(ssgeo)
+```
+
+```{r}
+# View datafile structure
+str(sscrime)
+```
+```{r}
+# Subset the crime data
+sscrime2018 <- dplyr::filter(sscrime, incident_datetime > "2017-12-31")
+```
+
+```{r}
+tm_shape(ssgeo) +
+tm_dots(sscrime2018)
+
+```
+
+```{r}
+map1 + tm_pol
+```
+

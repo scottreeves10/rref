@@ -3,11 +3,33 @@ title: "R Reference"
 output: html_document
 ---
 
-## Setup
+# Libraries
 
 ```{r}
 library(tidyverse)
 ```
+
+# R Markdown
+
+Add a new chunk:
+
+* Ctrl/Cmd+Alt+I*
+
+Run chunk:
+
+* Ctrl/Cmd+Shift+Enter 
+
+Preview/Knit:
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file). The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Assignment:
+
+* Alt/Opt+-
+
+Commment/Uncomment:
+
+* Ctrl/Cmd+Shift+C
 
 # Base R
 

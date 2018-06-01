@@ -7,8 +7,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Acknowledgements
+
 https://geocompr.robinlovelace.net/
 https://github.com/Robinlovelace/geocompr 
+
+# Libraries
 
 ```{r}
 library(sf)          # classes and functions for vector data
@@ -25,6 +29,10 @@ https://github.com/Robinlovelace/geocompr/issues/126
 
 library(spDataLarge)   # load larger geographic data
 ```
+
+# Geographic data in R
+
+## 2.1 Vector Data
 
 ```{r}
 names(world)
@@ -65,7 +73,7 @@ world_sp = as(world, Class = "Spatial")
 world_sf = st_as_sf(world_sp, "sf")
 ```
 
-### Basic map making {#basic-map}
+### 2.1.3 Basic map making {#basic-map}
 
 Basic maps are created in **sf** with `plot()`.
 By default this creates a multi-panel plot (like **sp**'s `spplot()`), one sub-plot for each variable of the object, as illustrated in the left-hand panel in Figure \@ref(fig:sfplot).
@@ -122,23 +130,93 @@ cex = sqrt(world$pop) / 10000
 plot(st_geometry(world_centroids), add = TRUE, cex = cex)
 ```
 
+```{r}
+par(pty = "s") #square
+plot(st_as_sfc(c("POINT(5 2)")), axes = TRUE, main = "POINT")
+```
+
+```{r}
+par(pty = "s")
+plot(st_as_sfc("LINESTRING(1 5, 4 4, 4 1, 2 2, 3 2)"), axes = TRUE, main = "LINESTRING")
+```
 
 
+```{r}
+par(pty = "s")
+plot(st_as_sfc("POLYGON((1 5, 2 2, 4 1, 4 4, 1 5))"), col="gray", axes = TRUE, main = "POLYGON")
+```
 
+```{r}
+par(pty = "s")
+plot(st_as_sfc("POLYGON((1 5, 2 2, 4 1, 4 4, 1 5), (2 4, 3 4, 3 3, 2 3, 2 4))"), col="gray", axes = TRUE, main = "POLYGON with a hole")
+```
 
+```{r}
+par(mfrow = c(1, 3), pty = "s", mar = c(0, 3, 1, 0))
+plot(st_as_sfc("MULTIPOINT (5 2, 1 3, 3 4, 3 2)"), axes = TRUE, main = "MULTIPOINT")
+plot(st_as_sfc("MULTILINESTRING ((1 5, 4 4, 4 1, 2 2, 3 2), (1 2, 2 4))"), axes = TRUE, main = "MULTILINESTRING")
+plot(st_as_sfc("MULTIPOLYGON (((1 5, 2 2, 4 1, 4 4, 1 5), (0 2, 1 2, 1 3, 0 3, 0 2)))"), col="gray", axes = TRUE, main = "MULTIPOLYGON")
+par(mfrow = c(1, 1))
+```
 
+```{r}
+par(pty = "s")
+plot(st_as_sfc("GEOMETRYCOLLECTION (MULTIPOINT (5 2, 1 3, 3 4, 3 2), LINESTRING (1 5, 4 4, 4 1, 2 2, 3 2)))"),
+     axes = TRUE, main = "GEOMETRYCOLLECTION")
+```
 
+```{r}
+# sfc POINT
+point1 = st_point(c(5, 2))
+point2 = st_point(c(1, 3))
+st_sfc(point1, point2)
+```
 
+```{r}
+# sfg objects
+london_point = st_point(c(0.1, 51.5))
+ruan_point = st_point(c(-9, 53))
 
+# sfc object
+our_geometry = st_sfc(london_point, ruan_point, crs = 4326)
 
+# data.frame object
+our_attributes = data.frame(name = c("London", "Ruan"),
+                            temperature = c(25, 13),
+                            date = c(as.Date("2017-06-21"), as.Date("2017-06-22")),
+                            category = c("city", "village"),
+                            automatic = c(FALSE, TRUE))
 
+# sf object
+sf_points = st_sf(our_attributes, geometry = our_geometry)
+```
 
+```{r}
+sf_points
+```
 
+```{r}
+class(sf_points)
 
+```
 
+## 2.2 Raster data
 
+```{r}
+raster_filepath = system.file("raster/srtm.tif", package = "spDataLarge")
+new_raster = raster(raster_filepath)
+```
 
+```{r}
+new_raster
 
+```
+
+### 2.2.2 Basic map making
+
+```{r}
+plot(new_raster)
+```
 
 
 
