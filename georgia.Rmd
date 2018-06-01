@@ -1,0 +1,134 @@
+---
+title: "Mapping - Sandy Spring, GA"
+author: Scott Reeves
+# date: 2018-05-20
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+set.seed(1014)
+#options(digits = 3)
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "100%",fig.align = 'center',fig.width = 10,fig.asp = 0.618)
+
+options(dplyr.print_min = 5, dplyr.print_max = 5)
+```
+
+# Sources and References
+
+__Georgia Open Data__
+
+https://data-georgiagio.opendata.arcgis.com/datasets?q=boundaries&sort_by=relevance
+
+__County Helath Rankings__
+
+http://www.countyhealthrankings.org/rankings/data/GA 
+
+
+# Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(sf)
+library(tidyverse)
+
+# While running R as the administrator, reinstall ggplot2 like this:
+# 
+# devtools::install_github("tidyverse/ggplot2")
+# require(ggplot2)
+
+library(ggplot2)
+library(tmap)
+
+```
+
+## Data
+
+```{r}
+
+gacounties<- st_read("F:/datasets/georgia/Counties_Georgia/Counties_Georgia.shp")
+
+obesity_csv <- read.csv("F:/datasets/georgia/ga_adult_obesity.csv")
+
+```
+
+```{r}
+glimpse(gacounties)
+```
+
+```{r}
+glimpse(obesity)
+```
+
+
+```{r}
+gaobesity <- gacounties %>% 
+  left_join(obesity, by = c("NAME10" = "County"))
+
+```
+
+```{r}
+glimpse(gaobesity)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+plot(gacounties$geometry)
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = gacounties) +
+  labs(title="Georgia Counties")
+```
+
+```{r}
+ggplot() +
+  #geom_sf(data = gacounties) +
+  geom_sf(data = gaobesity) +
+  scale_fill_gradient2("pct_Obese")
+  labs(title="Georgia Counties")
+```
+
+```{r}
+tm_shape(gaobesity) +
+  tm_polygons("Z_Score")
+```
+
+```{r}
+tm_shape(gaobesity) +
+  tm_polygons("Z_Score") +
+  tm_layout("Georgia Obesity")
+```
+
+```{r}
+tm_shape(gaobesity) +
+  tm_polygons("Z_Score") +
+  tm_legend(legend.position = c("right", "top"),
+            main.title = "Georgia Obesity - Deviation by County",
+            main.title.position = "left",
+            main.title.size = 1)
+```
+
+
+
+```{r}
+ggplot() +
+  geom_sf(data = citylimits) +
+  geom_sf(data = streets_filt %>% filter(StreetType %in% c("RD", "HWY"))) +
+  geom_sf(data = maycrime_sf, aes(color = parent_incident_type)) +
+  labs(title = "Crime - Sandy Springs, GA - 5/1 thru 5/20/18")
+
+
+```
+
+
+
+
+
+
+
