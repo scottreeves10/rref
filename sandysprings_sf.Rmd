@@ -8,6 +8,15 @@ output:
     toc_float: true
 ---
 
+```{r setup, include=FALSE}
+set.seed(1014)
+#options(digits = 3)
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "70%",fig.align = 'center',fig.width = 7,fig.asp = 0.618)
+
+options(dplyr.print_min = 5, dplyr.print_max = 5)
+```
+
 # Sources and References
 
 __Open Data, City of Sandy Springs__
@@ -57,9 +66,13 @@ citylimits <- st_read("F:/datasets/sandyspringsga/City_Limit__Sandy_Springs_Geor
 
 streets <- st_read("F:/datasets/sandyspringsga/Streets__Sandy_Springs_Georgia/Streets__Sandy_Springs_Georgia.shp")
 
+streets_filt <- st_read("F:/datasets/sandyspringsga/Streets__Sandy_Springs_Georgia__Filtered/Streets__Sandy_Springs_Georgia.shp")
+
+crime <- read.csv("F:/datasets/sandyspringsga/Sandy_Springs_Police_Department.csv")
+
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 plot(citylimits[9])
 ```
 
@@ -68,7 +81,7 @@ glimpse(citylimits)
 ```
 
 
-```{r}
+```{r eval=FALSE}
 # Create a plot
 
 ggplot() +
@@ -83,14 +96,14 @@ ggplot() +
   
 ```
 
-```{r}
+```{r eval=FALSE}
 glimpse(streets)
 
 ```
 
-```{r}
+```{r eval=FALSE}
 ggplot() +
-  geom_sf(data = streets)
+  geom_sf(data = streets_filt %>% filter(StreetType %in% c("RD", "HWY")))
 ```
 
 ```{r}
@@ -98,7 +111,7 @@ levels(streets$StreetType)
 ```
 
 
-```{r}
+```{r eval=FALSE}
 # Create a plot
 
 ggplot() +
@@ -114,11 +127,53 @@ ggplot() +
   
 ```
 
+```{r eval=FALSE}
+glimpse(crime)
+```
+
+
+```{r}
+crimedate <- as.Date(crime$incident_datetime, format = "%m/%d/%Y")
+```
+
+```{r}
+maycrime <- filter(crime, as.Date(incident_datetime, format = "%m/%d/%Y") > "2018-04-30")
+
+head(maycrime)
+```
+
+```{r}
+maycrime_sf <- st_as_sf(x = maycrime,
+                        coords = c("longitude", "latitude"),
+                        crs = "+proj=longlat +datum=WGS84")
+```
+
+```{r eval=FALSE}
+plot(maycrime_sf)
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = citylimits) +
+  geom_sf(data = streets_filt %>% filter(StreetType %in% c("RD", "HWY"))) +
+  geom_sf(data = maycrime_sf, aes(color = parent_incident_type)) +
+  labs(title = "Crime - Sandy Springs, GA - 5/1 thru 5/20/18")
+
+
+```
+
+
+
+```{r}
+levels(maycrime$parent_incident_type)
+```
+
 
 # --------------------------
 
 
-```{r}
+```{r eval=FALSE}
 # Assign shapefile to a variable using tmaptools's read_shape()
 # as.sf = TRUE means as a simple features object (sf package) akin to a regualr dataframe.
 
@@ -126,47 +181,48 @@ ssgeo <- read_shape(districtsshapefile, as.sf = TRUE)
 
 ```
 
-```{r}
+```{r eval=FALSE}
 # Try a couple of quick basic plots
 
 plot(ssgeo)
 ```
 
-```{r}
+```{r eval=FALSE}
 qtm(ssgeo)
 ```
 
-```{r}
+```{r eval=FALSE}
 qtm(ssgeo, fill = "DISTRICT")
 ```
 
 
-```{r}
+```{r eval=FALSE}
 # Assign data file to var
 sscrime <- rio::import(crimedatafile)
 ```
 
-```{r}
+```{r eval=FALSE}
 #  View the shapefile structure
 str(ssgeo)
 ```
 
-```{r}
+```{r eval=FALSE}
 # View datafile structure
 str(sscrime)
 ```
-```{r}
+
+```{r eval=FALSE}
 # Subset the crime data
 sscrime2018 <- dplyr::filter(sscrime, incident_datetime > "2017-12-31")
 ```
 
-```{r}
+```{r eval=FALSE}
 tm_shape(ssgeo) +
 tm_dots(sscrime2018)
 
 ```
 
-```{r}
+```{r eval=FALSE}
 map1 + tm_pol
 ```
 
