@@ -10,12 +10,21 @@ output:
 
 # Sources and References
 
-Open Data, City of Sandy Springs
+__Open Data, City of Sandy Springs__
+
 https://data-coss.opendata.arcgis.com/ 
+
+__Inspiration__
 
 https://xvrdm.github.io/2017/09/15/create-maps-from-sitg-files-with-sf-and-ggplot2/ 
 
+__ggplot2__
+
 http://ggplot2.tidyverse.org/reference/ggsf.html 
+
+__Colors__
+
+http://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
 # Libraries
 
@@ -25,13 +34,14 @@ library(sf)
 library(tidyverse)
 
 
-# library(ggplot2)
 # could not find function “geom_sf”
 # 
 # While running R as the administrator, reinstall ggplot2 like this:
 # 
 # devtools::install_github("tidyverse/ggplot2")
 # require(ggplot2)
+
+library(ggplot2)
 
 # library(tmap)
 # library(tmaptools)
@@ -45,6 +55,8 @@ library(tidyverse)
 
 citylimits <- st_read("F:/datasets/sandyspringsga/City_Limit__Sandy_Springs_Georgia/City_Limit__Sandy_Springs_Georgia.shp")
 
+streets <- st_read("F:/datasets/sandyspringsga/Streets__Sandy_Springs_Georgia/Streets__Sandy_Springs_Georgia.shp")
+
 ```
 
 ```{r}
@@ -54,6 +66,56 @@ plot(citylimits[9])
 ```{r}
 glimpse(citylimits)
 ```
+
+
+```{r}
+# Create a plot
+
+ggplot() +
+  
+  # add a layer with lightgrey citylimit polygons
+  
+  geom_sf(data=citylimits, fill="cornflowerblue", color="blueviolet") +
+  
+  # add a title
+  
+  labs(title = "Sandy Springs, GA")
+  
+```
+
+```{r}
+glimpse(streets)
+
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = streets)
+```
+
+```{r}
+levels(streets$StreetType)
+```
+
+
+```{r}
+# Create a plot
+
+ggplot() +
+  
+  # add a layer with lightgrey citylimit polygons
+  
+  geom_sf(data=citylimits, fill="snow2", color="blueviolet") +
+  geom_sf(data = streets %>% filter(ZipCodeLef == "30342" | ZipCodeRig =="30342")) +
+  
+  # add a title
+  
+  labs(title = "Sandy Springs, GA")
+  
+```
+
+
+# --------------------------
 
 
 ```{r}
