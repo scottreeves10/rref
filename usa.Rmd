@@ -22,6 +22,8 @@ options(dplyr.print_min = 5, dplyr.print_max = 5)
 
 [Shapefiles - States](https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html)
 
+[About creating tmap insets for AK and HI](https://github.com/mtennekes/tmap/tree/master/demo/USChoropleth)
+
 
 
 # Libraries
@@ -61,18 +63,33 @@ levels(states$NAME)
 ```
 
 
+
 ```{r}
-contig_48 <- subset(states, !(NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")))
+outside48 <- c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")
+
+contig48dc <- filter(states, !(NAME %in% outside48))
 ```
 
 
-```{r eval=FALSE, include=FALSE}
-plot(contig_48$geometry)
+
+```{r}
+qtm(contig48dc)
 ```
 
 
+```{r}
+tm_shape(contig48dc) +
+  tm_polygons()
+```
 
 
+```{r}
+tmap_mode(mode = "view")
+tm_shape(contig48dc) +
+  tm_polygons() +
+  tm_layout(basemaps = c('OpenStreetMap'))
+
+```
 
 
 
