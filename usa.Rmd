@@ -1,0 +1,82 @@
+---
+title: "Mapping - United States"
+author: Scott Reeves
+# date: 2018-05-20
+output: 
+  html_document 
+    # toc: true
+    # toc_float: true
+---
+
+```{r setup, include=FALSE}
+set.seed(1014)
+#options(digits = 3)
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "100%",fig.align = 'center',fig.width = 10,fig.asp = 0.618)
+
+options(dplyr.print_min = 5, dplyr.print_max = 5)
+```
+
+# Sources and References
+
+
+[Shapefiles - States](https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html)
+
+
+
+# Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(sf)
+library(tidyverse)
+
+# While running R as the administrator, reinstall ggplot2 like this:
+# 
+# devtools::install_github("tidyverse/ggplot2")
+# require(ggplot2)
+
+library(ggplot2)
+library(tmap)
+
+```
+
+## Data
+
+```{r}
+
+
+states <- st_read("F:/datasets/uscensus/cb_2017_us_state_5m/cb_2017_us_state_5m.shp")
+
+
+
+```
+
+```{r}
+glimpse(states)
+```
+
+```{r}
+levels(states$NAME)
+```
+
+
+```{r}
+contig_48 <- subset(states, !(NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")))
+```
+
+
+```{r eval=FALSE, include=FALSE}
+plot(contig_48$geometry)
+```
+
+
+
+
+
+
+
+
+
+
+
