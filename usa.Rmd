@@ -24,6 +24,8 @@ options(dplyr.print_min = 5, dplyr.print_max = 5)
 
 [About creating tmap insets for AK and HI](https://github.com/mtennekes/tmap/tree/master/demo/USChoropleth)
 
+[Leaflet Providers](http://leaflet-extras.github.io/leaflet-providers/preview/)
+
 
 
 # Libraries
@@ -86,11 +88,11 @@ tm_shape(contig48dc) +
 ```
 
 
-```{r}
+```{r message=FALSE}
 tmap_mode(mode = "view")
 tm_shape(contig48dc) +
-  tm_polygons() +
-  tm_layout(basemaps = c('OpenStreetMap'))
+  tm_polygons(alpha = 0) +
+  tm_view(basemaps = 'Esri.NatGeoWorldMap')
 
 ```
 
