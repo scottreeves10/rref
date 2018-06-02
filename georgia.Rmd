@@ -1,5 +1,5 @@
 ---
-title: "Mapping - Sandy Spring, GA"
+title: "Mapping - State of Georgia"
 author: Scott Reeves
 # date: 2018-05-20
 output: 
