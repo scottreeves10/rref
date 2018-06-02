@@ -5,8 +5,11 @@ output: html_document
 
 # Libraries
 
-```{r}
+```{r eval=FALSE}
 library(tidyverse)
+
+# tigris
+# devtools::install_github('walkerke/tigris') # dev version supports sf
 ```
 
 # R Markdown
@@ -34,6 +37,7 @@ Commment/Uncomment:
 # Base R
 
 ## c (combine)
+
 Combine Values into a Vector or List
 
 __Description__
@@ -325,7 +329,7 @@ http://r4ds.had.co.nz/iteration.html
 
 Imagine we have this simple tibble:
 
-```{r}
+```{r eval=FALSE}
 df <- tibble(
   a = rnorm(10),
   b = rnorm(10),
@@ -421,6 +425,28 @@ Base `sapply()` is a wrapper around `lapply()` that automatically simplifies the
 `vapply()` is a safe alternative to `sapply()` because you supply an additional argument that defines the type. The only problem with `vapply()` is that it’s a lot of typing: `vapply(df, is.numeric, logical(1))` is equivalent to `map_lgl(df, is.numeric)`. One advantage of `vapply()` over purrr’s map functions is that it can also produce matrices — the map functions only ever produce vectors.
 
 # Spatial
+
+[Loading and analysing spatial data with the sf package](http://pierreroudier.github.io/teaching/20170626-Pedometrics/20170626-soil-data.html)
+
+In the old days…
+The “classic approach” is a collection of 4 packages:
+
+* `sp`: provides a set of dedicated classes for the different vector and raster datatypes , and some analysis tools (overlays, etc.),
+* `rgdal`: input/output library built over GDAL/OGR to read and write spatial data,
+* `rgeos`: geometry library built over GEOS for all geometry operations (union, intersections, buffer, etc).
+
+The bleeding edge...
+⚡
+Recently (2017), a new package has been introduced to manipulate vector data: `sf` (for Simple Features). It’s a pretty interesting improvement on `sp/rgdal/rgeos`, and we will focus on it in this tutorial.
+
+In a few words, here’s what is interesting about sf:
+
+* It’s providing users with one unique class for all vector types,
+* It’s based on Simple Features, a formal standard (ISO 19125-1:2004) widely used in the GIS world that describes how objects in the real world can be represented,
+* The main class provided by sf is a data.frame – which means that a lot of data analysis methods are readily available,
+* It combines the capabilities of sp, rgdal, and rgeos under one unique package,
+* It is easier to install on some platforms than rgdal,
+* It is much faster, and scales better than sp and rgdal — the upcoming version will include spatial indexing!
 
 ## [R Spatial - Spatial Data Analysis and Modeling with R](http://rspatial.org/index.html)
 
