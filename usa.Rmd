@@ -78,8 +78,11 @@ qtm(contig48dc)
 
 
 ```{r}
+tmap_mode(mode = "plot")
+
 tm_shape(contig48dc) +
-  tm_polygons()
+  tm_polygons(col = "MAP_COLORS")
+
 ```
 
 
