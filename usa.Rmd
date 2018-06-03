@@ -91,8 +91,8 @@ tm_shape(contig48dc) +
 
 ```{r message=FALSE}
 tmap_mode(mode = "view")
-tm_shape(contig48dc) +
-  tm_polygons(alpha = 0) +
+tm_shape(contig48dc) + tm_polygons(alpha = 0) + 
+  tm_shape(zipcodes303s) + tm_polygons(alpha = .5) + 
   tm_view(basemaps = 'Esri.NatGeoWorldMap')
 
 ```
