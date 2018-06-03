@@ -34,6 +34,7 @@ options(dplyr.print_min = 5, dplyr.print_max = 5)
 
 library(sf)
 library(tidyverse)
+library(stringr)
 
 # While running R as the administrator, reinstall ggplot2 like this:
 # 
@@ -52,7 +53,7 @@ library(tmap)
 
 states <- st_read("F:/datasets/uscensus/cb_2017_us_state_5m/cb_2017_us_state_5m.shp")
 
-
+zipcodes <- st_read("F:/datasets/uscensus/cb_2017_us_zcta510_500k/cb_2017_us_zcta510_500k.shp", stringsAsFactors = FALSE)
 
 ```
 
@@ -97,8 +98,27 @@ tm_shape(contig48dc) +
 ```
 
 
+```{r}
+glimpse(zipcodes)
+```
 
 
+
+```{r}
+
+# value = TRUE is necessary to pull the values rather than the item's vector position
+zips303s <- grep("^303", zipcodes$ZCTA5CE10, value = TRUE)
+
+# this also works
+# zipcodes303s <- zipcodes %>% filter(ZCTA5CE10 >= "30300" & ZCTA5CE10 <= "30399")
+
+zipcodes303s <- zipcodes %>% filter(ZCTA5CE10 %in% zips303s)
+
+```
+
+```{r}
+qtm(zipcodes303s)
+```
 
 
 
