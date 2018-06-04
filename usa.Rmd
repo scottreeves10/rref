@@ -35,6 +35,7 @@ options(dplyr.print_min = 5, dplyr.print_max = 5)
 library(sf)
 library(tidyverse)
 library(stringr)
+library(leaflet)
 
 # While running R as the administrator, reinstall ggplot2 like this:
 # 
@@ -43,6 +44,7 @@ library(stringr)
 
 library(ggplot2)
 library(tmap)
+library(tmaptools)
 
 ```
 
@@ -57,15 +59,13 @@ zipcodes <- st_read("F:/datasets/uscensus/cb_2017_us_zcta510_500k/cb_2017_us_zct
 
 ```
 
-```{r}
+```{r eval=FALSE}
 glimpse(states)
 ```
 
-```{r}
+```{r eval=FALSE}
 levels(states$NAME)
 ```
-
-
 
 ```{r}
 outside48 <- c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")
@@ -73,21 +73,18 @@ outside48 <- c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "United Stat
 contig48dc <- filter(states, !(NAME %in% outside48))
 ```
 
-
-
 ```{r}
 qtm(contig48dc)
 ```
 
+```{r message=FALSE, warning=FALSE}
 
-```{r}
 tmap_mode(mode = "plot")
 
 tm_shape(contig48dc) +
   tm_polygons(col = "MAP_COLORS")
 
 ```
-
 
 ```{r message=FALSE}
 tmap_mode(mode = "view")
@@ -98,15 +95,14 @@ tm_shape(contig48dc) + tm_polygons(alpha = 0) +
 ```
 
 
-```{r}
+```{r eval=FALSE}
 glimpse(zipcodes)
 ```
-
-
 
 ```{r}
 
 # value = TRUE is necessary to pull the values rather than the item's vector position
+
 zips303s <- grep("^303", zipcodes$ZCTA5CE10, value = TRUE)
 
 # this also works
@@ -121,4 +117,43 @@ qtm(zipcodes303s)
 ```
 
 
+```{r}
+
+# # WORK on this error:
+# 
+# # sf layer has inconsistent datum (+proj=longlat +datum=NAD83 +no_defs).
+# # Need '+proj=longlat +datum=WGS84'
+
+leaflet(zipcodes303s) %>% 
+  addTiles() %>% 
+  addPolygons()
+
+
+```
+
+```{r}
+#  The first element to start with is tm_shape, which specifies the shape object. 
+
+# Next, one, or a combination of the following drawing layers should be specified: 
+# 
+# Base layers
+# 
+# tm_polygons	    Draw polygons	col
+# tm_symbols	    Draws symbols	size, col, shape
+# tm_lines	      Draws polylines	col, lwd
+# tm_raster	      Draws a raster	col
+# tm_text	        Add text labels	text, size, col
+# 
+# Derived layers
+# 
+# tm_fill	Fills the polygons	see tm_polygons
+# tm_borders	Draws polygon borders	none
+# tm_bubbles	Draws bubbles	see tm_symbols
+# tm_squares	Draws squares	see tm_symbols
+# tm_dots	Draws dots	see tm_symbols
+# tm_markers	Draws markers	see tm_symbols and tm_text
+# tm_iso	Draws iso/contour lines	see tm_lines and tm_text
+
+
+```
 
