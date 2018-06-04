@@ -3,9 +3,9 @@ title: "tmap"
 author: Scott Reeves
 # date: 2018-05-20
 output: 
-  html_document 
-    # toc: true
-    # toc_float: true
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -98,9 +98,15 @@ rivers | Rivers (spatial lines)
 land | Global land cover (spatial grid)
 
 ```{r}
+# from tmap package
 data(World, metro, rivers)
+```
 
+
+```{r}
+# convert to sf objects
 metro_sf <- st_as_sf(metro)
+World_sf <- st_as_sf(World)
 
 ```
 
@@ -141,7 +147,7 @@ Spatial data of global land cover, of class `SpatialGridDataFrame`. The data inc
 
 # animation_tmap
 
-_Interesting idea/element. Revisit later. _
+_Interesting concept/element. Revisit later. _
 
 Create a gif or mpeg animation from a tmap plot. The free tool ImageMagick is required.
 
@@ -166,13 +172,16 @@ See documentation.
 
 ## just the map
 ```{r}
-qtm(World)
+qtm(World) #SpatialPolygons shape object. 
 
 ```
 
 ## choropleth
 ```{r}
-qtm(World, fill = "economy", format="World", style="col_blind")
+qtm(World, 
+    fill = "economy", # fill the polygons based on data (other option would be to specify a color)
+    format="World", # tm_layout wrapper used for format.1 of 6 currently available in tmap. 
+    style="col_blind") # tm_layout wrapper used for style.
 ```
 
 ```{r}
@@ -221,7 +230,58 @@ The attribute elements are
 
 The element `tm_facets` specifies facets (small multiples). The element `tm_layout` is used to change the layout of the map.
 
-# tm_shape
+## tmap_arrange
+
+FILL LATER
+
+## tmap_icons
+
+FILL LATER
+
+## tmap_leaflet 
+
+__Description__
+
+Create a leaflet widget from a tmap object. An interactive map (see tmap_mode) is an automatically generated leaflet widget. With this function, this leaflet widget is obtained, which can then be changed or extended by using leaflet’s own methods.
+
+FILL LATER
+
+## tmap_mode
+
+FILL LATER
+
+## tmap_options
+
+FILL LATER
+
+## tm_add_legend
+
+FILL LATER
+
+## tm_compass 
+
+FILL LATER
+
+## tm_credits ETC - FILL LATER ...
+
+## Draw Polygons - tm_fill, tm_borders, tm_polygons
+
+__Description__
+
+Creates a `tmap-element` that draws the polygons. `tm_fill` fills the polygons. Either a fixed color is used, or a color palette is mapped to a data variable. `tm_borders` draws the borders of the polygons. `tm_polygons` fills the polygons and draws the polygon borders.
+
+
+### tm_fill
+
+### tm_borders
+
+### tm_polygons
+
+
+
+
+
+## tm_shape
 
 Specify the shape object
 
@@ -250,18 +310,28 @@ Simple features (sf objects) are also supported. For drawing layers `tm_fill` an
 
 * More arguments, see documentation.
 
-## Draw Polygons - tm_fill, tm_borders, tm_polygons
+https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html
 
-__Description__
+The first element to start with is `tm_shape`, which specifies the shape object. Next, one, or a combination of the following drawing layers should be specified:
 
-Creates a `tmap-element` that draws the polygons. `tm_fill` fills the polygons. Either a fixed color is used, or a color palette is mapped to a data variable. `tm_borders` draws the borders of the polygons. `tm_polygons` fills the polygons and draws the polygon borders.
+Drawing layer | Description | Aesthetics
+---|---|---
+Base layer | |
+`tm_polygons` | Draw polygons	| col
+`tm_symbols` | Draws symbols | size, col, shape
+`tm_lines` | Draws polylines | col, lwd
+`tm_raster` | Draws a raster | col
+`tm_text` | Add text labels | text, size, col
+Derived layers |  | 
+`tm_fill` | Fills the polygons | see tm_polygons
+`tm_borders` | Draws polygon borders | none
+`tm_bubbles` | Draws bubbles | see tm_symbols
+`tm_squares` | Draws squares | see tm_symbols
+`tm_dots` | Draws dots | see tm_symbols
+`tm_markers` | Draws markers | see tm_symbols and tm_text
+`tm_iso` | Draws iso/contour lines | see tm_lines and tm_text
 
 
-### tm_fill
-
-### tm_borders
-
-### tm_borders
 
 
 ```{r message=FALSE}
@@ -298,27 +368,6 @@ m
 
 
 
-
-https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html
-
-The first element to start with is tm_shape, which specifies the shape object. Next, one, or a combination of the following drawing layers should be specified:
-
-Drawing layer | Description | Aesthetics
----|---|---
-Base layer | |
-tm_polygons | Draw polygons	| col
-tm_symbols | Draws symbols | size, col, shape
-tm_lines | Draws polylines | col, lwd
-tm_raster | Draws a raster | col
-tm_text | Add text labels | text, size, col
-Derived layers |  | 
-tm_fill | Fills the polygons | see tm_polygons
-tm_borders | Draws polygon borders | none
-tm_bubbles | Draws bubbles | see tm_symbols
-tm_squares | Draws squares | see tm_symbols
-tm_dots | Draws dots | see tm_symbols
-tm_markers | Draws markers | see tm_symbols and tm_text
-tm_iso | Draws iso/contour lines | see tm_lines and tm_text
 
 
 
