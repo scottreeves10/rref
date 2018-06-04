@@ -367,6 +367,54 @@ m
 ```
 
 
+# Worflow with sf and tmap
+
+## Data
+
+Read in data
+
+```{r}
+mfg <- read.csv("F:/datasets/natlassocofmanufacturers/2017_state_mfg.csv")
+
+states <- st_read("F:/datasets/uscensus/cb_2017_us_state_5m/cb_2017_us_state_5m.shp")
+```
+
+
+
+### Cleanse data
+
+
+```{r}
+outside51 <- c("Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")
+
+states51 <- filter(states, !(NAME %in% outside51))
+```
+
+```{r}
+glimpse(states51)
+```
+
+```{r}
+# check to see if lengths are equal
+length(mfg$state) == length(states51$NAME)
+```
+
+```{r}
+glimpse(mfg)
+```
+
+
+### Join data
+
+```{r}
+mfg_map <- append_data(states51, mfg, key.shp = "NAME", key.data = "state")
+```
+
+## Map data
+
+```{r}
+qtm(mfg_map, fill = "total_mfg_bil")
+```
 
 
 
