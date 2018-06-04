@@ -1,0 +1,242 @@
+---
+title: "tmap"
+author: Scott Reeves
+# date: 2018-05-20
+output: 
+  html_document 
+    # toc: true
+    # toc_float: true
+---
+
+```{r setup, include=FALSE}
+# set.seed(1014)
+# options(digits = 3)
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "100%",fig.align = 'center',fig.width = 10, fig.asp = 1)
+
+# options(dplyr.print_min = 5, dplyr.print_max = 5)
+```
+
+# Sources and References
+
+[Package ‘tmap’ .pdf](https://cran.r-project.org/web/packages/tmap/tmap.pdf)
+
+[tmap in a nutshell](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html)
+
+[Shapefiles - States](https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html)
+
+[About creating tmap insets for AK and HI](https://github.com/mtennekes/tmap/tree/master/demo/USChoropleth)
+
+[Leaflet Providers](http://leaflet-extras.github.io/leaflet-providers/preview/)
+
+
+
+# Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(tmap)
+library(tmaptools)
+library(sf)
+library(tidyverse)
+library(leaflet)
+
+```
+
+```{r}
+tidyverse_packages()
+```
+
+# Package 'tmap'
+
+Author: Martijn Tennekes, etal
+
+## tmap-package
+
+Thematic maps are geographical maps in which spatial data distributions are visualized. This package offers a flexible, layer-based, and easy to use approach to create thematic maps, such as choropleths and bubble maps. It is based on the grammar of graphics, and resembles the syntax of ggplot2.
+
+## package functions
+
+### Quick plotting method - qtm
+
+Plot a thematic map
+
+### Main plotting method - tm_shape
+
+Specify a shape object
+
+Aesthetics base layers: | 
+---|---
+tm_polygons | Create a polygon layer (with borders)
+tm_symbols | Create a layer of symbols
+tm_lines | Create a layer of lines
+tm_raster | Create a raster layer
+tm_text | Create a layer of text labels
+
+Aesthetics derived layers: |  
+---|---
+tm_fill | Create a polygon layer (without borders)
+tm_borders | Create polygon borders
+tm_bubbles | Create a layer of bubbles
+tm_squares | Create a layer of squares
+tm_dots | Create a layer of dots
+tm_markers | Create a layer of markers
+tm_iso | Create a iso/contour lines
+
+More - see [tmap.pdf]
+
+# Data
+
+Spatial datasets (included in tmap package) |
+---|---
+World World | country data (spatial polygons)
+Europe European | country data (spatial polygons)
+NLD_prov | Netherlands province data (spatial polygons)
+NLD_muni | Netherlands municipal data (spatial polygons)
+metro | Metropolitan areas (spatial points)
+rivers | Rivers (spatial lines)
+land | Global land cover (spatial grid)
+
+```{r}
+data(World, metro, rivers)
+
+metro_sf <- st_as_sf(metro)
+
+```
+
+## World, Europe, and the Netherlands
+
+Maps of the world, Europe, and the Netherlands (province and municipality level), class SpatialPolygonsDataFrame
+
+The default projections for these maps are Eckhart IV (World), Lambert azimuthal (Europe), and Rijksdriehoekstelsel (Netherlands). See below. To change the projection, use set_projection. Alternatively, the projection can be changed temporarily for plotting purposes by using the projection
+argument of tm_shape (or qtm).
+
+World World map. The default projection for this world map is Eckhart IV since area sizes are preserved, which is a very important property for choropleths.
+
+Europe Europe map. The ETRS-LAEA projection is used by default for this map. This projection, as well as the bounding box, are also used in the maps published by Eurostat. Several countries are transcontinental and are partly located in Asia. From these countries, only data from Russia and Turkey have been included in this shape file since they are widely considered as European
+countries. The data is taken from the World data, where variables "part" and "EU_Schengen" have been added.
+
+NLD_prov and NLD_muni, maps of the Netherlands at province and municipality level of 2013. The used projection is the Rijksdriehoekstelsel projection. Important: publication of these maps is only allowed when cited to Statistics Netherlands (CBS) and Kadaster Nederland as source.
+
+
+## metro
+
+Spatial data of metropolitan areas, of class SpatialPointsDataFrame. The data includes a population times series from 1950 to (forecasted) 2030. All metro areas with over 1 million inhabitants in 2010 are included.
+
+```{r}
+glimpse(metro_sf)
+```
+
+## rivers
+
+Spatial data of rivers, of class SpatialLinesDataFrame
+
+Source
+http://www.naturalearthdata.com
+
+
+## land
+
+Spatial data of global land cover, of class SpatialGridDataFrame. The data includes a population times series from 1950 to (forecasted) 2030. All metro areas with over 1 million inhabitants in 2010 are included.
+
+
+# animation_tmap
+
+_Interesting idea/element. Revisit later. _
+
+Create a gif or mpeg animation from a tmap plot. The free tool ImageMagick is required.
+
+# qtm
+
+__Description__
+
+Draw a thematic map quickly.
+
+__Usage__
+
+qtm(shp, fill = NA, symbols.size = NULL, symbols.col = NULL,
+symbols.shape = NULL, dots.col = NULL, text = NULL, text.size = 1,
+text.col = NA, lines.lwd = NULL, lines.col = NULL, raster = NA,
+borders = NA, by = NULL, scale = NA, title = NA, projection = NULL,
+format = NULL, style = NULL, basemaps = NA, bubble.size = NULL,
+bubble.col = NULL, ...)
+
+__Arguments__
+
+See documentation.
+
+## just the map
+```{r}
+qtm(World)
+
+```
+
+## choropleth
+```{r}
+qtm(World, fill = "economy", format="World", style="col_blind")
+```
+
+```{r}
+qtm(World, fill="HPI", fill.n=9, fill.palette="div", fill.auto.palette.mapping=FALSE,
+fill.title="Happy Planet Index", fill.id="name", format="World", style="gray")
+
+```
+
+## bubble map
+```{r}
+current.mode <- tmap_mode("view")
+
+qtm(World, borders = NULL) +
+qtm(metro, symbols.size = "pop2010",
+symbols.title.size= "Metropolitan Areas",
+symbols.id= "name",
+format = "World")
+```
+
+
+
+# tm_shape
+
+Specify the shape object
+
+```{r message=FALSE}
+
+current.mode <- tmap_mode("plot")
+
+
+tm_shape(World, projection="longlat") +
+tm_polygons() +
+tm_layout("Long lat coordinates (WGS84)", inner.margins=c(0,0,.1,0), title.size=.8)
+
+```
+
+
+
+
+
+```{r}
+#  The first element to start with is tm_shape, which specifies the shape object. 
+
+# Next, one, or a combination of the following drawing layers should be specified: 
+# 
+# Base layers
+# 
+# tm_polygons	    Draw polygons	col
+# tm_symbols	    Draws symbols	size, col, shape
+# tm_lines	      Draws polylines	col, lwd
+# tm_raster	      Draws a raster	col
+# tm_text	        Add text labels	text, size, col
+# 
+# Derived layers
+# 
+# tm_fill	Fills the polygons	see tm_polygons
+# tm_borders	Draws polygon borders	none
+# tm_bubbles	Draws bubbles	see tm_symbols
+# tm_squares	Draws squares	see tm_symbols
+# tm_dots	Draws dots	see tm_symbols
+# tm_markers	Draws markers	see tm_symbols and tm_text
+# tm_iso	Draws iso/contour lines	see tm_lines and tm_text
+
+
+```
+
