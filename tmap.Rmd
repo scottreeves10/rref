@@ -37,6 +37,7 @@ knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "i
 
 library(tmap)
 library(tmaptools)
+library(grid)
 library(sf)
 library(tidyverse)
 library(leaflet)
@@ -390,7 +391,7 @@ outside51 <- c("Puerto Rico", "American Samoa", "United States Virgin Islands", 
 states51 <- filter(states, !(NAME %in% outside51))
 ```
 
-```{r}
+```{r eval=FALSE}
 glimpse(states51)
 ```
 
@@ -399,7 +400,7 @@ glimpse(states51)
 length(mfg$state) == length(states51$NAME)
 ```
 
-```{r}
+```{r eval=FALSE}
 glimpse(mfg)
 ```
 
@@ -410,11 +411,104 @@ glimpse(mfg)
 mfg_map <- append_data(states51, mfg, key.shp = "NAME", key.data = "state")
 ```
 
+```{r}
+US_cont <- mfg_map %>% 
+  subset(!NAME %in% c("Alaska", "Hawaii")) %>% 
+  simplify_shape(0.2) 
+
+US_AK <- mfg_map %>% 
+  subset(NAME == "Alaska") %>% 
+  simplify_shape(0.2)
+
+US_HI <- mfg_map %>% 
+  subset(NAME == "Hawaii") %>% 
+  simplify_shape(0.2) 
+
+```
+
 ## Map data
 
+
 ```{r}
-qtm(mfg_map, fill = "total_mfg_bil")
+m_cont <- tm_shape(US_cont, projection = 2163) +
+  tm_polygons("total_mfg_bil", 
+              palette="Reds",
+              title="",
+              border.col = "grey50",
+              border.alpha = .5) +
+  tm_credits("Data @ National Association of Manafacturers\nShape @ US Census Bureau", 
+             position = c("right", "bottom")) +
+  tm_layout(title="Total Manufacturing Output (in $billions, 2016)",
+            title.position = c("center", "top"),
+            legend.position = c("right", "bottom"),
+            frame = FALSE,
+            inner.margins = c(0.25, 0.15, 0.15, 0.15))
+
+
+
+m_AK <- tm_shape(US_AK, projection = 3338) +
+	tm_polygons("total_mfg_bil", 
+	            palette="Reds",
+	            border.col = "gray50", 
+	            border.alpha = .5, 
+	            breaks = seq(10, 50, by = 5)) +
+	tm_layout("Alaska", 
+	          legend.show = FALSE, 
+	          bg.color = NA, 
+	          title.size = 0.8, 
+	          frame = FALSE)
+
+
+
+m_HI <- tm_shape(US_HI, projection = 3759) +
+	tm_polygons("total_mfg_bil", 
+	            palette="Reds",
+	            border.col = "gray50", 
+	            border.alpha = .5, 
+	            breaks=seq(10, 50, by = 5)) +
+	tm_layout("Hawaii", 
+	          legend.show = FALSE, 
+	          bg.color=NA, 
+	          title.position = c("LEFT", "BOTTOM"), 
+	          title.size = 0.8, frame=FALSE)
+
 ```
+
+
+```{r}
+vp_AK <- viewport(x = 0.15, y = 0.15, width = 0.3, height = 0.3)
+vp_HI <- viewport(x = 0.4, y = 0.1, width = 0.2, height = 0.1)
+
+```
+
+
+```{r}
+tmap_mode("plot")
+m_cont
+print(m_AK, vp = vp_AK)
+print(m_HI, vp = vp_HI)
+```
+
+
+```{r}
+save_tmap(m_cont, "us_mfg_output_2016.png",
+          insets_tm = list(m_AK, m_HI),
+          insets_vp = list(vp_AK, vp_HI))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
