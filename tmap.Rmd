@@ -53,7 +53,7 @@ Author: Martijn Tennekes, etal
 
 ## tmap-package
 
-Thematic maps are geographical maps in which spatial data distributions are visualized. This package offers a flexible, layer-based, and easy to use approach to create thematic maps, such as choropleths and bubble maps. It is based on the grammar of graphics, and resembles the syntax of ggplot2.
+Thematic maps are geographical maps in which spatial data distributions are visualized. This package offers a flexible, layer-based, and easy to use approach to create thematic maps, such as choropleths and bubble maps. It is based on the grammar of graphics, and resembles the syntax of `ggplot2`.
 
 ## package functions
 
@@ -67,21 +67,21 @@ Specify a shape object
 
 Aesthetics base layers: | 
 ---|---
-tm_polygons | Create a polygon layer (with borders)
-tm_symbols | Create a layer of symbols
-tm_lines | Create a layer of lines
-tm_raster | Create a raster layer
-tm_text | Create a layer of text labels
+`tm_polygons` | Create a polygon layer (with borders)
+`tm_symbols` | Create a layer of symbols
+`tm_lines` | Create a layer of lines
+`tm_raster` | Create a raster layer
+`tm_text` | Create a layer of text labels
 
 Aesthetics derived layers: |  
 ---|---
-tm_fill | Create a polygon layer (without borders)
-tm_borders | Create polygon borders
-tm_bubbles | Create a layer of bubbles
-tm_squares | Create a layer of squares
-tm_dots | Create a layer of dots
-tm_markers | Create a layer of markers
-tm_iso | Create a iso/contour lines
+`tm_fill` | Create a polygon layer (without borders)
+`tm_borders` | Create polygon borders
+`tm_bubbles` | Create a layer of bubbles
+`tm_squares` | Create a layer of squares
+`tm_dots` | Create a layer of dots
+`tm_markers` | Create a layer of markers
+`tm_iso` | Create a iso/contour lines
 
 More - see [tmap.pdf]
 
@@ -106,15 +106,14 @@ metro_sf <- st_as_sf(metro)
 
 ## World, Europe, and the Netherlands
 
-Maps of the world, Europe, and the Netherlands (province and municipality level), class SpatialPolygonsDataFrame
+Maps of the world, Europe, and the Netherlands (province and municipality level), class `SpatialPolygonsDataFrame`
 
 The default projections for these maps are Eckhart IV (World), Lambert azimuthal (Europe), and Rijksdriehoekstelsel (Netherlands). See below. To change the projection, use set_projection. Alternatively, the projection can be changed temporarily for plotting purposes by using the projection
-argument of tm_shape (or qtm).
+argument of `tm_shape` (or `qtm`).
 
 World World map. The default projection for this world map is Eckhart IV since area sizes are preserved, which is a very important property for choropleths.
 
-Europe Europe map. The ETRS-LAEA projection is used by default for this map. This projection, as well as the bounding box, are also used in the maps published by Eurostat. Several countries are transcontinental and are partly located in Asia. From these countries, only data from Russia and Turkey have been included in this shape file since they are widely considered as European
-countries. The data is taken from the World data, where variables "part" and "EU_Schengen" have been added.
+Europe Europe map. The ETRS-LAEA projection is used by default for this map. This projection, as well as the bounding box, are also used in the maps published by Eurostat. Several countries are transcontinental and are partly located in Asia. From these countries, only data from Russia and Turkey have been included in this shape file since they are widely considered as European countries. The data is taken from the World data, where variables "part" and "EU_Schengen" have been added.
 
 NLD_prov and NLD_muni, maps of the Netherlands at province and municipality level of 2013. The used projection is the Rijksdriehoekstelsel projection. Important: publication of these maps is only allowed when cited to Statistics Netherlands (CBS) and Kadaster Nederland as source.
 
@@ -129,7 +128,7 @@ glimpse(metro_sf)
 
 ## rivers
 
-Spatial data of rivers, of class SpatialLinesDataFrame
+Spatial data of rivers, of class `SpatialLinesDataFrame`
 
 Source
 http://www.naturalearthdata.com
@@ -137,7 +136,7 @@ http://www.naturalearthdata.com
 
 ## land
 
-Spatial data of global land cover, of class SpatialGridDataFrame. The data includes a population times series from 1950 to (forecasted) 2030. All metro areas with over 1 million inhabitants in 2010 are included.
+Spatial data of global land cover, of class `SpatialGridDataFrame`. The data includes a population times series from 1950 to (forecasted) 2030. All metro areas with over 1 million inhabitants in 2010 are included.
 
 
 # animation_tmap
@@ -193,11 +192,77 @@ symbols.id= "name",
 format = "World")
 ```
 
+# tmap-element
 
+__Description__
+
+Building block for drawing thematic maps. All element functions have the prefix tm_.
+
+__Details__
+
+The fundamental, and hence required element is 
+* `tm_shape` that specifies the shape object, and also specifies the projection and bounding box
+The elements that serve as aesthetics layers are
+* `tm_fil`l to fill the polygons
+* `tm_borders` to draw polygon borders
+* tm_polygons to draw polygons (it is a combination of tm_fill and tm_borders)
+* `tm_bubbles` to draw bubbles
+* `tm_lines` to draw lines
+* `tm_text` to add text annotations
+* `tm_raster` to draw a raster
+
+The layers can be stacked by simply adding them with the + symbol. The combination of the elements described above form one group. Multiple groups can be stacked. Each group should start with tm_shape.
+
+The attribute elements are
+* `tm_grid` to specify coordinate grid lines
+* `tm_credits` to add a credits/acknowledgements text label
+* `tm_scale_bar` to add a measurement scale bar
+* `tm_compass` to add a map compass
+
+The element `tm_facets` specifies facets (small multiples). The element `tm_layout` is used to change the layout of the map.
 
 # tm_shape
 
 Specify the shape object
+
+__Description___
+
+Creates a `tmap-element` that specifies the shape object. Also the projection and covered area (bounding box) can be set. It is possible to use multiple shape objects within one plot (see tmap-element).
+
+__Usage___
+
+tm_shape(shp, name = NULL, is.master = NA, projection = NULL,
+bbox = NULL, unit = getOption("tmap.unit"), simplify = 1,
+line.center.type = c("segment", "midpoint"), ...)
+
+__Arguments___
+
+shp shape object, which is one of:
+
+1. SpatialPolygons(DataFrame)
+2. SpatialPoints(DataFrame)
+3. SpatialLines(DataFrame)
+4. SpatialGrid(DataFrame)
+5. SpatialPixels(DataFrame)
+6. RasterLayer, RasterStack, or RasterBrick
+
+Simple features (sf objects) are also supported. For drawing layers `tm_fill` and `tm_borders`, 1 is required. For drawing layer `tm_lines`, 3 is required. Layers `tm_symbols` and `tm_text` accept 1 to 3. For layer `tm_raster`, 4, 5, or 6 is required.
+
+* More arguments, see documentation.
+
+## Draw Polygons - tm_fill, tm_borders, tm_polygons
+
+__Description__
+
+Creates a `tmap-element` that draws the polygons. `tm_fill` fills the polygons. Either a fixed color is used, or a color palette is mapped to a data variable. `tm_borders` draws the borders of the polygons. `tm_polygons` fills the polygons and draws the polygon borders.
+
+
+### tm_fill
+
+### tm_borders
+
+### tm_borders
+
 
 ```{r message=FALSE}
 
@@ -211,32 +276,50 @@ tm_layout("Long lat coordinates (WGS84)", inner.margins=c(0,0,.1,0), title.size=
 ```
 
 
-
-
-
 ```{r}
-#  The first element to start with is tm_shape, which specifies the shape object. 
+#from save_tmap
 
-# Next, one, or a combination of the following drawing layers should be specified: 
-# 
-# Base layers
-# 
-# tm_polygons	    Draw polygons	col
-# tm_symbols	    Draws symbols	size, col, shape
-# tm_lines	      Draws polylines	col, lwd
-# tm_raster	      Draws a raster	col
-# tm_text	        Add text labels	text, size, col
-# 
-# Derived layers
-# 
-# tm_fill	Fills the polygons	see tm_polygons
-# tm_borders	Draws polygon borders	none
-# tm_bubbles	Draws bubbles	see tm_symbols
-# tm_squares	Draws squares	see tm_symbols
-# tm_dots	Draws dots	see tm_symbols
-# tm_markers	Draws markers	see tm_symbols and tm_text
-# tm_iso	Draws iso/contour lines	see tm_lines and tm_text
+current.mode <- tmap_mode("plot")
 
+data(NLD_muni, NLD_prov)
+
+m <- tm_shape(NLD_muni) +
+  tm_fill(col="population", convert2density=TRUE, style="kmeans", title=expression("Population (per " * km^2 * ")"), legend.hist=FALSE) +
+  tm_borders("black", alpha=.5) + 
+  tm_shape(NLD_prov) + 
+  tm_borders("grey25", lwd=2) + 
+  tm_format_NLD(inner.margins = c(.02, .15, .06, .15)) + 
+  tm_scale_bar(position = c("left", "bottom")) +
+  tm_compass(position=c("right", "bottom")) +
+  tm_style_classic()
+m
 
 ```
+
+
+
+
+https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html
+
+The first element to start with is tm_shape, which specifies the shape object. Next, one, or a combination of the following drawing layers should be specified:
+
+Drawing layer | Description | Aesthetics
+---|---|---
+Base layer | |
+tm_polygons | Draw polygons	| col
+tm_symbols | Draws symbols | size, col, shape
+tm_lines | Draws polylines | col, lwd
+tm_raster | Draws a raster | col
+tm_text | Add text labels | text, size, col
+Derived layers |  | 
+tm_fill | Fills the polygons | see tm_polygons
+tm_borders | Draws polygon borders | none
+tm_bubbles | Draws bubbles | see tm_symbols
+tm_squares | Draws squares | see tm_symbols
+tm_dots | Draws dots | see tm_symbols
+tm_markers | Draws markers | see tm_symbols and tm_text
+tm_iso | Draws iso/contour lines | see tm_lines and tm_text
+
+
+
 
