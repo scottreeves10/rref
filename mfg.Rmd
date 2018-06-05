@@ -1,0 +1,194 @@
+---
+title: "Total 2016 Manufacturing Output, United States"
+author: Scott Reeves
+# date: 2018-05-20
+output: pdf_document
+    #toc: true
+    #toc_float: true
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "100%",fig.align = 'center',fig.width = 10, fig.asp = 1)
+
+```
+
+## Sources and References
+
+[Package ‘tmap’ .pdf](https://cran.r-project.org/web/packages/tmap/tmap.pdf)
+
+[tmap in a nutshell](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html)
+
+[Shapefiles - States](https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html)
+
+[About creating tmap insets for AK and HI](https://github.com/mtennekes/tmap/tree/master/demo/USChoropleth)
+
+
+## Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(tmap)
+library(tmaptools)
+library(grid)
+library(sf)
+library(tidyverse)
+# library(leaflet)
+
+```
+
+```{r}
+tidyverse_packages()
+```
+
+## Package 'tmap'
+
+Author: Martijn Tennekes, etal
+
+## tmap-package
+
+Thematic maps are geographical maps in which spatial data distributions are visualized. This package offers a flexible, layer-based, and easy to use approach to create thematic maps, such as choropleths and bubble maps. It is based on the grammar of graphics, and resembles the syntax of `ggplot2`.
+
+## Data
+
+```{r}
+mfg <- read.csv("F:/datasets/natlassocofmanufacturers/2017_state_mfg.csv")
+
+states <- st_read("F:/datasets/uscensus/cb_2017_us_state_5m/cb_2017_us_state_5m.shp")
+```
+
+### Subset states census data
+
+```{r}
+outside51 <- c("Puerto Rico", "American Samoa", "United States Virgin Islands", "Guam", "Commonwealth of the Northern Mariana Islands")
+
+states51 <- filter(states, !(NAME %in% outside51))
+```
+
+```{r eval=FALSE}
+glimpse(states51)
+```
+
+```{r eval=FALSE}
+# check to see if lengths are equal
+length(mfg$state) == length(states51$NAME)
+```
+
+```{r eval=FALSE}
+glimpse(mfg)
+```
+
+### Join spatial and mfg data into sf data frame
+
+```{r}
+mfg_map <- append_data(states51, mfg, key.shp = "NAME", key.data = "state")
+```
+
+### Further subset data for map insets
+
+```{r}
+US_cont <- mfg_map %>% 
+  subset(!NAME %in% c("Alaska", "Hawaii")) %>% 
+  simplify_shape(0.2) 
+
+US_AK <- mfg_map %>% 
+  subset(NAME == "Alaska") %>% 
+  simplify_shape(0.2)
+
+US_HI <- mfg_map %>% 
+  subset(NAME == "Hawaii") %>% 
+  simplify_shape(0.2) 
+
+```
+
+## Map 
+
+```{r}
+m_cont <- tm_shape(US_cont, projection = 2163) +
+  tm_polygons("total_mfg_bil", 
+              palette="YlOrRd",
+              title="",
+              border.col = "grey50",
+              border.alpha = .5) +
+  tm_credits("Data @ National Association of Manafacturers\nShape @ US Census Bureau", 
+             position = c("right", "bottom")) +
+  tm_layout(title="Total Manufacturing Output (in $billions, 2016)",
+            title.position = c("center", "top"),
+            legend.position = c("right", "bottom"),
+            frame = FALSE,
+            inner.margins = c(0.25, 0.15, 0.15, 0.15))
+
+
+
+m_AK <- tm_shape(US_AK, projection = 3338) +
+	tm_polygons("total_mfg_bil", 
+	            palette="YlOrRd",
+	            border.col = "gray50", 
+	            border.alpha = .5, 
+	            breaks = seq(10, 50, by = 5)) +
+	tm_layout("Alaska", 
+	          legend.show = FALSE, 
+	          bg.color = NA, 
+	          title.size = 0.8, 
+	          frame = FALSE)
+
+
+
+m_HI <- tm_shape(US_HI, projection = 3759) +
+	tm_polygons("total_mfg_bil", 
+	            palette="YlOrRd",
+	            border.col = "gray50", 
+	            border.alpha = .5, 
+	            breaks=seq(10, 50, by = 5)) +
+	tm_layout("Hawaii", 
+	          legend.show = FALSE, 
+	          bg.color=NA, 
+	          title.position = c("LEFT", "BOTTOM"), 
+	          title.size = 0.8, frame=FALSE)
+
+```
+
+### Set viewports
+
+```{r}
+vp_AK <- viewport(x = 0.15, y = 0.15, width = 0.3, height = 0.3)
+vp_HI <- viewport(x = 0.4, y = 0.1, width = 0.2, height = 0.1)
+
+```
+
+### Print plot
+
+```{r}
+tmap_mode("plot")
+m_cont
+print(m_AK, vp = vp_AK)
+print(m_HI, vp = vp_HI)
+```
+
+## Save image
+
+```{r}
+save_tmap(m_cont, "us_mfg_output_2016.png",
+          scale = 0.7, width = 5.125,
+          insets_tm = list(m_AK, m_HI),
+          insets_vp = list(vp_AK, vp_HI))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
