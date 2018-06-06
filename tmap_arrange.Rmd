@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(comment = "#>",collapse = TRUE,cache = TRUE, fig.path = "images/",out.width = "100%",fig.align = 'center',fig.width = 10, fig.asp = 1)
+
+```
+
+## Sources and References
+
+[Package ‘tmap’ .pdf](https://cran.r-project.org/web/packages/tmap/tmap.pdf)
+
+[tmap in a nutshell](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html)
+
+
+## Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(tmap)
+library(tmaptools)
+library(grid)
+library(sf)
+library(tidyverse)
+# library(leaflet)
+
+```
+
+```{r}
+tidyverse_packages()
+
+```
+
+```{r}
+data(World)
+w1 <- qtm(World, projection = "eck4", title="Eckert IV")
+w2 <- qtm(World, projection = "merc", title="Mercator")
+w3 <- qtm(World, projection = "wintri", title="Winkel-Tripel")
+w4 <- qtm(World, projection = "robin", title="Robinsin")
+
+current.mode <- tmap_mode("plot")
+tmap_arrange(w1, w2, w3, w4)
+tmap_mode(current.mode)
+```
+
+
+
+
+
